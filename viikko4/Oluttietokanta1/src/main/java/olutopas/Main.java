@@ -10,12 +10,14 @@ import olutopas.model.Beer;
 import olutopas.model.Brewery;
 
 import com.avaje.ebean.Transaction;
+import olutopas.model.Pub;
 import olutopas.model.Rating;
 import olutopas.model.User;
 
 public class Main {
 
     enum Database {
+
         H2, SQLite
     }
 
@@ -58,13 +60,14 @@ public class Main {
         config.addClass(Brewery.class);
         config.addClass(User.class);
         config.addClass(Rating.class);
-        
+        config.addClass(Pub.class);
+
         if (dropAndCreateDatabase) {
             config.setDdlGenerate(true);
             config.setDdlRun(true);
             //config.setDebugSql(true);
-        }        
-        
+        }
+
         return EbeanServerFactory.create(config);
     }
 }

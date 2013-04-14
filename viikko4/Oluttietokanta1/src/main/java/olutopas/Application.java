@@ -6,6 +6,7 @@ import java.util.Scanner;
 import javax.persistence.OptimisticLockException;
 import olutopas.model.Beer;
 import olutopas.model.Brewery;
+import olutopas.model.Pub;
 import olutopas.model.Rating;
 import olutopas.model.User;
 
@@ -50,6 +51,14 @@ public class Application {
                 this.addBrewery();
             } else if (command.equals("8")) {
                 this.deleteBrewery();
+            } else if (command.equals("9")) {
+                this.addPub();
+            } else if (command.equals("b")) {
+                this.addBeerToPub();
+            } else if (command.equals("s")) {
+                this.showBeersInPub();
+            } else if (command.equals("r")) {
+                this.removeBeerFromPub();
             } else if (command.equals("t")) {
                 this.showRatings(user);
             } else if (command.equals("y")) {
@@ -75,6 +84,10 @@ public class Application {
         System.out.println("6   list beers");
         System.out.println("7   add brewery");
         System.out.println("8   delete brewery");
+        System.out.println("9   add pub");
+        System.out.println("b   add beer to pub");
+        System.out.println("s   show beers in pub");
+        System.out.println("s   remove beers from pub");
         System.out.println("t   delete brewery");
         System.out.println("y   list users");
         System.out.println("0   quit");
@@ -324,7 +337,85 @@ public class Application {
         System.out.println("Ratings by " + user.getUsername());
         List<Rating> ratings = server.find(Rating.class).where().eq("user", user).findList();
         for (Rating rating : ratings) {
-            System.out.println(rating.getBeer() + " "+ rating.getValue() + " points");
+            System.out.println(rating.getBeer() + " " + rating.getValue() + " points");
         }
+    }
+
+    private void addPub() {
+        System.out.print("pub to add: ");
+
+        String name = scanner.nextLine();
+
+        Pub exists = server.find(Pub.class).where().like("name", name).findUnique();
+        if (exists != null) {
+            System.out.println(name + " exists already");
+            return;
+        }
+
+        server.save(new Pub(name));
+    }
+
+    private void addBeerToPub() {
+        System.out.print("beer: ");
+        String name = scanner.nextLine();
+        Beer beer = server.find(Beer.class).where().like("name", name).findUnique();
+
+        if (beer == null) {
+            System.out.println("does not exist");
+            return;
+        }
+
+        System.out.print("pub: ");
+        name = scanner.nextLine();
+        Pub pub = server.find(Pub.class).where().like("name", name).findUnique();
+
+        if (pub == null) {
+            System.out.println("does not exist");
+            return;
+        }
+
+        pub.addBeer(beer);
+        server.save(pub);
+    }
+
+    private void showBeersInPub() {
+        System.out.print("pub: ");
+        String name = scanner.nextLine();
+        Pub pub = server.find(Pub.class).where().like("name", name).findUnique();
+        List<Beer> beers = server.find(Beer.class).where().eq("pubs", pub).findList();
+        for (Beer beer : beers) {
+            System.out.println(beer);
+        }
+    }
+
+    private void ListPubs() {
+        List<Pub> pubs = server.find(Pub.class).findList();
+        for (Pub pub : pubs) {
+            System.out.println(pub);
+        }
+    }
+
+    private void removeBeerFromPub() {
+        System.out.print("beer: ");
+        String name = scanner.nextLine();
+        Beer beer = server.find(Beer.class).where().like("name", name).findUnique();
+
+        if (beer == null) {
+            System.out.println("does not exist");
+            return;
+        }
+
+        System.out.print("pub: ");
+        name = scanner.nextLine();
+        Pub pub = server.find(Pub.class).where().like("name", name).findUnique();
+
+        if (pub == null) {
+            System.out.println("does not exist");
+            return;
+        }
+
+        pub.removeBeer(beer);
+        server.save(pub);
+
     }
 }
