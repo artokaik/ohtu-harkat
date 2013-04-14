@@ -58,7 +58,7 @@ public class Brewery {
         if (beers == null) {
             beers = new ArrayList<Beer>();
         }
-    
+   
         beers.add(b);
         b.setBrewery(this);
     }

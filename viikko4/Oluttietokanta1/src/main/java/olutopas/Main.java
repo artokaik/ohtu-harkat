@@ -10,6 +10,7 @@ import olutopas.model.Beer;
 import olutopas.model.Brewery;
 
 import com.avaje.ebean.Transaction;
+import olutopas.model.Rating;
 import olutopas.model.User;
 
 public class Main {
@@ -56,7 +57,8 @@ public class Main {
         config.addClass(Beer.class);
         config.addClass(Brewery.class);
         config.addClass(User.class);
-
+        config.addClass(Rating.class);
+        
         if (dropAndCreateDatabase) {
             config.setDdlGenerate(true);
             config.setDdlRun(true);

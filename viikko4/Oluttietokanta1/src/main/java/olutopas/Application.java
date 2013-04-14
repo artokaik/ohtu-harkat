@@ -6,6 +6,7 @@ import java.util.Scanner;
 import javax.persistence.OptimisticLockException;
 import olutopas.model.Beer;
 import olutopas.model.Brewery;
+import olutopas.model.Rating;
 import olutopas.model.User;
 
 public class Application {
@@ -36,7 +37,7 @@ public class Application {
             } else if (command.equals("1")) {
                 findBrewery();
             } else if (command.equals("2")) {
-                findBeer();
+                findBeer(user);
             } else if (command.equals("3")) {
                 addBeer();
             } else if (command.equals("4")) {
@@ -49,7 +50,9 @@ public class Application {
                 this.addBrewery();
             } else if (command.equals("8")) {
                 this.deleteBrewery();
-            } else if (command.equals("9")) {
+            } else if (command.equals("t")) {
+                this.showRatings(user);
+            } else if (command.equals("y")) {
                 this.listUsers();
             } else {
                 System.out.println("unknown command");
@@ -72,7 +75,8 @@ public class Application {
         System.out.println("6   list beers");
         System.out.println("7   add brewery");
         System.out.println("8   delete brewery");
-        System.out.println("9   list users");
+        System.out.println("t   delete brewery");
+        System.out.println("y   list users");
         System.out.println("0   quit");
         System.out.println("");
     }
@@ -99,7 +103,7 @@ public class Application {
         server.save(new Brewery("Paulaner"));
     }
 
-    private void findBeer() {
+    private void findBeer(User user) {
         System.out.print("beer to find: ");
         String n = scanner.nextLine();
         Beer foundBeer = server.find(Beer.class).where().like("name", n).findUnique();
@@ -109,7 +113,50 @@ public class Application {
             return;
         }
 
-        System.out.println("found: " + foundBeer);
+        System.out.println(foundBeer);
+        System.out.println("  ratings given " + this.numberOfRatings(foundBeer) + " average given " + this.averageRating(foundBeer));
+        if (this.userRating(user, foundBeer) == null) {
+            System.out.println("  not available currently!");
+            rateBeer(user, foundBeer);
+        } else {
+            System.out.println(userRating(user, foundBeer));
+        }
+
+
+    }
+
+    private String userRating(User user, Beer beer) {
+        Rating rating = server.find(Rating.class).where().eq("beer", beer).eq("user", user).findUnique();
+        if (rating == null) {
+            return null;
+        } else {
+            return rating.getValue() + " points";
+        }
+
+    }
+
+    private void rateBeer(User user, Beer beer) {
+        while (true) {
+            System.out.print("give rating (leave emtpy if not): ");
+            String rate = scanner.nextLine();
+            System.out.println("");
+            if (rate.isEmpty()) {
+                return;
+            }
+            try {
+                Integer value = Integer.parseInt(rate);
+                if (value >= 0 && value <= 10) {
+                    Rating rating = new Rating();
+                    rating.setBeer(beer);
+                    rating.setUser(user);
+                    rating.setValue(value);
+                    server.save(rating);
+                    return;
+                }
+            } catch (Exception e) {
+            }
+            System.out.println("Enter value between 0 and 10");
+        }
     }
 
     private void findBrewery() {
@@ -179,6 +226,7 @@ public class Application {
         List<Beer> beers = server.find(Beer.class).findList();
         for (Beer beer : beers) {
             System.out.println(beer);
+            System.out.println("  ratings given " + this.numberOfRatings(beer) + " average given " + this.averageRating(beer));
         }
     }
 
@@ -255,6 +303,28 @@ public class Application {
         List<User> users = server.find(User.class).findList();
         for (User user : users) {
             System.out.println(user);
+        }
+    }
+
+    private double averageRating(Beer beer) {
+        List<Rating> ratings = server.find(Rating.class).where().eq("beer", beer).findList();
+        double total = 0;
+        for (Rating rating : ratings) {
+            total += rating.getValue();
+        }
+        return total / ratings.size();
+    }
+
+    private int numberOfRatings(Beer beer) {
+        List<Rating> ratings = server.find(Rating.class).where().eq("beer", beer).findList();
+        return ratings.size();
+    }
+
+    private void showRatings(User user) {
+        System.out.println("Ratings by " + user.getUsername());
+        List<Rating> ratings = server.find(Rating.class).where().eq("user", user).findList();
+        for (Rating rating : ratings) {
+            System.out.println(rating.getBeer() + " "+ rating.getValue() + " points");
         }
     }
 }
