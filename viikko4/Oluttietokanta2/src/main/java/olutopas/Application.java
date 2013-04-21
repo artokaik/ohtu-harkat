@@ -41,6 +41,7 @@ public class Application {
             } else if (command.equals("4")) {
                 listBreweries();
             } else if (command.equals("5")) {
+<<<<<<< HEAD
                 deleteBeer();
             } else if (command.equals("6")) {
                 addPub();
@@ -53,6 +54,14 @@ public class Application {
             } else if (command.equals("r")) {
                 this.removeBeerFromPub();
             } else {
+=======
+                deleteBeer();            
+            } else if (command.equals("6")) {
+                addPub();            
+            } else if (command.equals("7")) {
+                addBeerToPub();
+            }  else {
+>>>>>>> 570ead237c66308a2d326e584a234d637370e02d
                 System.out.println("unknown command");
             }
 
@@ -70,11 +79,16 @@ public class Application {
         System.out.println("3   add beer");
         System.out.println("4   list breweries");
         System.out.println("5   delete beer");
+<<<<<<< HEAD
         System.out.println("6   add pub");
         System.out.println("7   add beer to pub");
         System.out.println("8   show beers in pub");
         System.out.println("9   list pubs");
         System.out.println("r   remove beer from pub");
+=======
+        System.out.println("6   add pub");               
+        System.out.println("7   add beer to pub");                      
+>>>>>>> 570ead237c66308a2d326e584a234d637370e02d
         System.out.println("0   quit");
         System.out.println("");
     }
@@ -228,6 +242,7 @@ public class Application {
         server.save(pub);
     }
 
+<<<<<<< HEAD
     private void showBeersInPub() {
         System.out.print("pub: ");
         String name = scanner.nextLine();
@@ -268,4 +283,6 @@ public class Application {
         server.save(pub);
 
     }
+=======
+>>>>>>> 570ead237c66308a2d326e584a234d637370e02d
 }
