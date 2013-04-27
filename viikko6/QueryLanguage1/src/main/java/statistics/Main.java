@@ -1,6 +1,7 @@
 package statistics;
 
 import statistics.matcher.*;
+import statistics.queries.QueryBuilder;
 
 public class Main {
 
@@ -14,10 +15,28 @@ public class Main {
         for (Player player : stats.matches(m)) {
             System.out.println(player);
         }
+        System.out.println("builder");
+        QueryBuilder query = new QueryBuilder();
+
+        m = query.hasAtLeast(10, "goals").hasAtLeast(10, "assists").playsIn("PHI").build();
+
+        for (Player player : stats.matches(m)) {
+            System.out.println(player);
+        }
         System.out.println("or");
-        m = new Or(new HasAtLeast(20, "goals"),
-                new HasAtLeast(30, "assists"),
-                new PlaysIn("PHI"));
+
+        m = new Or(new And(new HasAtLeast(10, "goals"),
+                new HasAtLeast(10, "assists"),
+                new PlaysIn("PHI")), new And(new HasAtLeast(10, "goals"),
+                new HasAtLeast(10, "assists"),
+                new PlaysIn("OTT")));
+
+        for (Player player : stats.matches(m)) {
+            System.out.println(player);
+        }
+        System.out.println("or build");
+         m = query.oneOf(query.hasAtLeast(10, "goals").hasAtLeast(10, "assists").playsIn("PHI").build(), 
+                 query.hasAtLeast(10, "goals").hasAtLeast(10, "assists").playsIn("OTT").build()).build();
 
         for (Player player : stats.matches(m)) {
             System.out.println(player);
